@@ -86,7 +86,8 @@
                 <p class="u-text u-text-2">
                   Data was pulled from the CERN(European Organization for Nuclear Research) opendata portal. The raw data picked up from the sensors are translated into low level features
                   and grouped into "jets" of particles. A group of particles flying in close proximity is referred to as a jet. In our dataset each jet is an instance of data tracking 19 features of up to 100 particles
-                  within the jet. The dataset was also split by the classification of subatomic particles contained within the jet, but was made blind to this in hopes of improving the robustness of the model.
+                  within the jet. The dataset was also split by the classification of subatomic particles contained within the jet, but was made blind to this in hopes of improving the robustness of the model. Each data file contains a different 
+                  range of jet masses, which presents some bias to the neural network model that will be seen during validation.
                   </p>
               </div>
             </div>
@@ -112,7 +113,7 @@
               The data files were easily convertible into numpy and pandas data formats, data analysis was performed primarily using these libraries. We used feature engineered the 100 length arrays into higher level single value features
               to perform correlation and population density based on the truth-level mass labels. This was then used to construct a deep learning model. Any deep learning model is made up of an input layer and several hidden layers and 
               an output layer. We used two types of architechture, PyTorch and Keras, their primary difference being that PyTorch creates an unordered set of particles for each jet. With some testing we found that the order of the arrays actually has an affect
-              on prediction resolution, so our final model was built and trained using PyTorch.
+              on prediction resolution, so our final model was built and trained using PyTorch. The pytorch architechture requires the data be converted into .pytorch files which are stored in static memory, and loads in batches of those files into RAM prior to prediction.
             </p>
             <p class="u-text u-text-5">Hidden Nodes&nbsp;</p>
           </div>
@@ -124,7 +125,8 @@
         <img class="u-expanded-height u-image u-image-default u-preserve-proportions u-image-1" src="images/trainingpref.png" alt="" data-image-width="1000" data-image-height="1000">
         <h2 class="u-text u-text-default u-text-1">Training Preformance</h2>
         <p class="u-text u-text-2">During training we measured loss we using Root Mean Squared Error, and enforced the training loop with early stopping to prevent loss of robustness.
-          Figure on the right shows an overall downward trend in RMSE measured on training and validation set. 
+          Figure on the right shows an overall downward trend in RMSE measured on training and validation set. We can see that due to the nature of how the data is organized and because we did not remove outliers validation
+          is unstable. This issue persists because trying to build a properly randomly sampled from multiple files tended to be extremely space inefficent.
           You can see training process stopped after ~30th epoch, and the best weights were calculated at ~25th epoch.
         </p>
       </div>
@@ -139,7 +141,7 @@
               of the model. Similar approach is applied for test set as training and validation sets with a modification in the metric of loss. 
               For evaluation using test set, we calculated the *resolution of the predictions: <br>
               “Resolution = (prediction - truth) / truth”<br>
-              *The plot on the left is prediction resolution 1000 different jets in the test set, the left skew shows that the model tends to predict closer to the truth</p>
+              *The plot on the left is prediction resolution on 1000 different jets in the test set, the left skew shows that the model tends to predict closer to the truth but struggles with outliers</p>
           </div>
         </div>
       </div>
